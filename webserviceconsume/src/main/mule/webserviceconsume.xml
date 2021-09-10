@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<mule xmlns:ee="http://www.mulesoft.org/schema/mule/ee/core" xmlns:wsc="http://www.mulesoft.org/schema/mule/wsc"
+	xmlns:http="http://www.mulesoft.org/schema/mule/http"
+	xmlns="http://www.mulesoft.org/schema/mule/core" xmlns:doc="http://www.mulesoft.org/schema/mule/documentation" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd
+http://www.mulesoft.org/schema/mule/wsc http://www.mulesoft.org/schema/mule/wsc/current/mule-wsc.xsd
+http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/ee/core/current/mule-ee.xsd">
+	<wsc:config name="Web_Service_Consumer_Config" doc:name="Web Service Consumer Config" doc:id="0503c65c-1c4b-4b09-8e11-3b990b9ed355" >
+		<wsc:connection wsdlLocation="http://www.dneonline.com/calculator.asmx?wsdl" service="Calculator" port="CalculatorSoap" address="http://www.dneonline.com/calculator.asmx" />
+	</wsc:config>
+	<http:listener-config name="HTTP_Listener_config" doc:name="HTTP Listener config" doc:id="bd0bcda0-473d-41fb-bf3e-b2c9d5db65d1" >
+		<http:listener-connection host="localhost" port="8888" />
+	</http:listener-config>
+	<flow name="webserviceconsumeFlow" doc:id="e9127a2b-b9d8-4d44-92e1-fe9dfe89efc6" >
+		<http:listener doc:name="Listener" doc:id="7bf61488-d1fd-4a22-b4a5-2ed87f6c89f7" config-ref="HTTP_Listener_config" path="/mule"/>
+		<set-variable value="10" doc:name="Number1" doc:id="d94dac83-eda5-47f2-9c8d-cba24acb771e" variableName="Num1"/>
+		<set-variable value="5" doc:name="Number2" doc:id="3d9824de-9ca3-48d3-bb2e-aa6b8ea475dc" variableName="Num2"/>
+		<ee:transform doc:name="Transform Message" doc:id="99dc0264-7698-4b7a-82a5-5ae00af49b2d" >
+			<ee:message >
+				<ee:set-payload ><![CDATA[%dw 2.0
+output application/xml
+ns ns0 http://tempuri.org/
+---
+{
+	ns0#Add: {
+		ns0#intA: vars.Num2 as Number,
+		ns0#intB: vars.Num1 as Number
+	}
+}]]></ee:set-payload>
+			</ee:message>
+		</ee:transform>
+		<wsc:consume operation="Add" doc:name="Consume" doc:id="f6648b0b-bfb0-457e-ac9d-d84d91404a6e" config-ref="Web_Service_Consumer_Config"/>
+		<logger level="INFO" doc:name="Logger" doc:id="027a11e8-17bb-41b1-82c6-a9318d43d6d2" message="#[payload]"/>
+	</flow>
+</mule>

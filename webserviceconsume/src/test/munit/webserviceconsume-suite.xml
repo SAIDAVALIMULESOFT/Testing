@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<mule xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xmlns:munit="http://www.mulesoft.org/schema/mule/munit" xmlns:munit-tools="http://www.mulesoft.org/schema/mule/munit-tools"
+	xmlns="http://www.mulesoft.org/schema/mule/core" xmlns:doc="http://www.mulesoft.org/schema/mule/documentation"
+	xsi:schemaLocation="
+		http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+		http://www.mulesoft.org/schema/mule/munit http://www.mulesoft.org/schema/mule/munit/current/mule-munit.xsd
+		http://www.mulesoft.org/schema/mule/munit-tools  http://www.mulesoft.org/schema/mule/munit-tools/current/mule-munit-tools.xsd">
+	<munit:config name="webserviceconsume-suite.xml" />
+	<munit:test name="webserviceconsumeFlow-test" doc:id="e4f58c58-d45a-42e8-aeb8-10f529dc622f" >
+		<munit:behavior >
+			<munit:set-event doc:name="Set Input" doc:id="031f92d5-efb6-4cbc-96e3-bfc88b524c91" >
+				<munit:payload value="#[readUrl('classpath://webserviceconsumeFlowtest\set-event_payload.dwl')]" encoding="UTF-8" />
+				<munit:attributes value="#[readUrl('classpath://webserviceconsumeFlowtest\set-event_attributes.dwl')]" />
+			</munit:set-event>
+		</munit:behavior>
+		<munit:execution >
+			<flow-ref doc:name="Flow-ref to webserviceconsumeFlow" doc:id="4370ae14-7563-4903-b627-951e551fb2f2" name="webserviceconsumeFlow"/>
+		</munit:execution>
+		<munit:validation >
+			<munit-tools:assert doc:name="Assert payload" doc:id="6d585d2a-5c63-4e35-b1d9-4e0fc542b2cc" message="The payload does not match">
+				<munit-tools:that ><![CDATA[#[%dw 2.0
+import webserviceconsumeFlowtest::assert_expression_payload
+---
+assert_expression_payload::main({payload: payload, attributes: attributes, vars: vars})]]]></munit-tools:that>
+			</munit-tools:assert>
+		</munit:validation>
+	</munit:test>
+
+
+</mule>
